@@ -1,0 +1,2 @@
+eval_file: data/samples/eval_predictions.jsonl
+output_file: outputs/eval/metrics.json

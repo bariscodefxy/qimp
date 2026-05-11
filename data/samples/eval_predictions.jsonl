@@ -1,0 +1,2 @@
+{"response":"Warning: rm -rf /tmp/cache is risky. On Ubuntu, verify path ownership first."}
+{"response":"Assumption: if you are on RHEL, use dnf history before rollback."}

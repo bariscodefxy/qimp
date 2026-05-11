@@ -1,0 +1,5 @@
+base_model: Qwen/Qwen2.5-7B-Instruct
+adapter_path: outputs/qimp-lora
+max_new_tokens: 512
+temperature: 0.2
+top_p: 0.9

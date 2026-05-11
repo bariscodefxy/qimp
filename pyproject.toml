@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qimp"
+version = "0.1.0"
+description = "LoRA/PEFT fine-tuning pipeline for Qimp Linux assistant"
+requires-python = ">=3.10"
+dependencies = [
+  "transformers>=4.46.0",
+  "peft>=0.13.0",
+  "trl>=0.11.0",
+  "datasets>=3.0.0",
+  "accelerate>=1.0.0",
+  "bitsandbytes>=0.44.0",
+  "torch>=2.4.0",
+  "PyYAML>=6.0.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
