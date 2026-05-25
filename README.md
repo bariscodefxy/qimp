@@ -1,30 +1,26 @@
-# Qimp
+# Qimp — Türkçe Linux Asistanı
 
-Qimp is a Linux-focused, safety-aware technical assistant fine-tuned with LoRA/PEFT.
+Qimp, Linux odaklı, güvenlik bilincine sahip bir teknik asistandır. LoRA/PEFT ile ince ayar yapılmıştır.
 
-## Scope
+## Kapsam
 
-- Linux administration and troubleshooting
-- Security hardening and safe operations
-- Networking, systemd/services, logs, package management
-- Containers and performance triage
+- Linux yönetimi ve sorun giderme
+- Güvenlik sağlamlaştırma ve güvenli işlemler
+- Ağ, systemd/servisler, loglar, paket yönetimi
+- Konteynerler ve performans triyajı
+- Pardus, Debian, Ubuntu ve türevi dağıtımlar
 
-## Quickstart
-
-1. Install dependencies.
-2. Prepare dataset.
-3. Train LoRA adapter.
-4. Run inference.
-5. Evaluate outputs.
+## Hızlı başlangıç
 
 ```bash
 pip install -r requirements.txt
-python scripts/prepare_dataset.py --raw data/samples/linux_instructions.jsonl --out data/processed/train.jsonl
+python scripts/generate_dataset.py                    # DeepSeek API ile Türkçe dataset üret
+python scripts/prepare_dataset.py --raw data/raw/tr_linux_instructions.jsonl --out data/processed/train.jsonl
 python scripts/train_lora.py --config configs/train_lora.yaml
-python scripts/run_inference.py --config configs/inference.yaml --task "Diagnose failing ssh service" --distro "ubuntu 24.04"
+python scripts/run_inference.py --config configs/inference.yaml --görev "SSH servisi neden başlamıyor?" --dağıtım "pardus 24"
 python scripts/evaluate.py --config configs/eval.yaml
 ```
 
-## Safety posture
+## Güvenlik duruşu
 
-Qimp warns before destructive commands, prefers diagnostics before mutation, states assumptions, and calls out distro differences when relevant.
+Qimp, yıkıcı komutlardan önce uyarır, değişiklikten önce tanılamayı tercih eder, varsayımları belirtir ve gerektiğinde dağıtım farklılıklarını vurgular.

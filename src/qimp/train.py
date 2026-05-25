@@ -35,12 +35,20 @@ def load_train_config(path: Path) -> TrainConfig:
 
 
 def run_train(config: TrainConfig) -> None:
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-    )
+    use_cuda = torch.cuda.is_available()
+    device_map = "auto" if use_cuda else "cpu"
+
+    if use_cuda:
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_compute_dtype=torch.bfloat16,
+        )
+        quantization_config = bnb_config
+    else:
+        quantization_config = None
+        print("CUDA yok, CPU'da çalışıyor (yavaş olabilir)")
 
     tokenizer = AutoTokenizer.from_pretrained(config.base_model, use_fast=True)
     if tokenizer.pad_token is None:
@@ -48,9 +56,11 @@ def run_train(config: TrainConfig) -> None:
 
     model = AutoModelForCausalLM.from_pretrained(
         config.base_model,
-        quantization_config=bnb_config,
-        device_map="auto",
+        quantization_config=quantization_config,
+        device_map=device_map,
         trust_remote_code=True,
+        dtype=torch.bfloat16 if use_cuda else torch.float32,
+        attn_implementation="eager",
     )
 
     dataset = load_dataset("json", data_files={"train": config.train_file})["train"]
@@ -72,8 +82,9 @@ def run_train(config: TrainConfig) -> None:
         gradient_accumulation_steps=config.gradient_accumulation_steps,
         logging_steps=config.logging_steps,
         save_steps=config.save_steps,
-        max_seq_length=config.max_seq_length,
-        bf16=True,
+        max_length=config.max_seq_length,
+        bf16=use_cuda,
+        fp16=False,
         report_to="none",
         dataset_text_field="text",
     )
@@ -87,7 +98,7 @@ def run_train(config: TrainConfig) -> None:
 
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=train_ds,
         peft_config=peft_config,
         args=sft_config,

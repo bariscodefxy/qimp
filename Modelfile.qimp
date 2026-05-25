@@ -1,0 +1,10 @@
+FROM outputs/qimp-merged
+TEMPLATE "{{ if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"
+PARAMETER temperature 0.2
+PARAMETER top_p 0.9
+PARAMETER max_tokens 512

@@ -28,7 +28,13 @@ def load_inference_config(path: str) -> InferenceConfig:
 
 def run_inference(config: InferenceConfig, task: str, distro: str | None = None, context: str | None = None) -> str:
     tokenizer = AutoTokenizer.from_pretrained(config.base_model, use_fast=True)
-    base = AutoModelForCausalLM.from_pretrained(config.base_model, device_map="auto", torch_dtype=torch.bfloat16)
+    base = AutoModelForCausalLM.from_pretrained(
+        config.base_model,
+        device_map="auto",
+        dtype=torch.bfloat16,
+        trust_remote_code=True,
+        attn_implementation="eager",
+    )
     model = PeftModel.from_pretrained(base, config.adapter_path)
 
     messages = [
@@ -50,6 +56,6 @@ def run_inference(config: InferenceConfig, task: str, distro: str | None = None,
     decoded = tokenizer.decode(out[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
     findings = assess_commands(decoded)
     if findings:
-        warnings = "\n".join([f"[RISK:{f.risk}] {f.command} ({f.reason})" for f in findings])
-        return decoded.strip() + "\n\nSafety warnings:\n" + warnings
+        warnings = "\n".join([f"[RİSK:{f.risk}] {f.command} ({f.reason})" for f in findings])
+        return decoded.strip() + "\n\nGüvenlik uyarıları:\n" + warnings
     return decoded.strip()
